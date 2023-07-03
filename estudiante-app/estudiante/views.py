@@ -6,6 +6,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+import pandas as pd
 
 # Create your views here.
 
@@ -72,3 +73,11 @@ def login_estudiante(request):
 def logout_estudiante(request):
     logout(request)
     return redirect('/')
+
+def carga_excel(request):
+    if request.method == 'POST':
+        file = request.FILES['excel_file']
+        df = pd.read_excel(file)
+        columns = df.columns.tolist()
+        return render(request, 'result.html', {'columns': columns})
+    return render(request, 'carga_excel.html')
