@@ -1,0 +1,29 @@
+<h1>Resultados de la Regresión con Bosques Aleatorios</h1>
+
+<h2>Coeficiente de determinación (R2): {{ r2_rf }}</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Students</th>
+      <th>Workshop_1_10_</th>
+      <th>CollaborativeActivity_10%</th>
+      <th>Exam_1_20%</th>
+      <th>Grade (Real)</th>
+      <th>Grade prediccion (Bosques Aleatorios)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for index, row in results.iterrows %}
+    <tr>
+      <td>{{ row.Students }}</td>
+      <td>{{ row.Workshop__1_10 }}</td>
+      <td>{{ row.CollaborativeActivity_10 }}</td>
+      <td>{{ row.Exam_1_20 }}</td>
+      <td>{{ row.Grade__Real }}</td>
+      <td>{{ row.Grade__prediccion__Bosques__Aleatorios }}</td>
+
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

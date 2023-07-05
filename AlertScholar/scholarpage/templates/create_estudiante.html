@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href={% static 'style.css' %}>
+    <title>Crear estudiante</title>
+</head>
+<body>
+
+    <main>
+        <div class="main-form">
+            <h1 class="main-title">Crear Estudiante</h1>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="id_foto">Foto:</label>
+                    <input type="file" name="foto" id="id_foto" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_nombre">Nombre:</label>
+                    <input type="text" name="nombre" id="id_nombre" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_apellido">Apellido:</label>
+                    <input type="text" name="apellido" id="id_apellido" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_codigo">Código:</label>
+                    <input type="text" name="codigo" id="id_codigo" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_correo">Correo:</label>
+                    <input type="email" name="correo" id="id_correo" required>
+                </div>
+                <button class="button creates" type="submit">Crear estudiante</button>
+                <a class="button cancel" href="{% url 'estudiantes' %}">Cancelar</a>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
