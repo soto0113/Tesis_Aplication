@@ -1,6 +1,0 @@
-<h1>Cargar archivo de Excel</h1>
-<form method="post" enctype="multipart/form-data" action="{% url 'carga_excel' %}">
-    {% csrf_token %}
-    <input type="file" name="excel_file" accept=".xlsx">
-    <button type="submit">Cargar</button>
-</form>
