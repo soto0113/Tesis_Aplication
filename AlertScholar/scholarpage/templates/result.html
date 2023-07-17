@@ -1,6 +1,26 @@
-<h1>Columnas del archivo de Excel</h1>
-<ul>
-    {% for column in columns %}
-        <li>{{ column }}</li>
+<h1 class="main-title">Resultado de la Predicción</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Estudiante</th>
+      <th>Workshop 1_10%</th>
+      <th>Exam 1_ 20%</th>
+      <th>CollaborativeActivity_10%</th>
+      <th>Nota</th>
+      <th>Prediccion</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for index, row in results.iterrows %}
+    <tr>
+     <td>{{ index + 1 }}</td>
+      <td>{{ row['Workshop 1_10%'] }}</td>
+      <td>{{ row['Exam 1_ 20%'] }}</td>
+      <td>{{ row['CollaborativeActivity_10%'] }}</td>
+      <td>{{ row['Nota'] }}</td>
+      <td>{{ row['Prediccion'] }}</td>
+    </tr>
     {% endfor %}
-</ul>
+  </tbody>
+</table>

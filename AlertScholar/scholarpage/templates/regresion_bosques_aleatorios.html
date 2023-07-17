@@ -1,29 +1,71 @@
-<h1>Resultados de la Regresión con Bosques Aleatorios</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href={% static 'style.css' %}>
+    <title>Estudiantes app</title>
+</head>
+<body>
+    <main>
+      <h1 class="main-title">Resultados de la Regresión con Bosques Aleatorios</h1>
 
-<h2>Coeficiente de determinación (R2): {{ r2_rf }}</h2>
+      <h2>Coeficiente de determinación (R2): {{ r2_rf }}</h2>
+      <h2>Error absoluto medio (MAE): {{ mae }}</h2>
+      <h2>Error porcentual absoluto medio (MAPE): {{ mape }}</h2>
+      <h2>Raíz del error cuadrático medio (RMSE): {{ rmse }}</h2>
 
-<table>
-  <thead>
-    <tr>
-      <th>Students</th>
-      <th>Workshop_1_10_</th>
-      <th>CollaborativeActivity_10%</th>
-      <th>Exam_1_20%</th>
-      <th>Grade (Real)</th>
-      <th>Grade prediccion (Bosques Aleatorios)</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for index, row in results.iterrows %}
-    <tr>
-      <td>{{ row.Students }}</td>
-      <td>{{ row.Workshop__1_10 }}</td>
-      <td>{{ row.CollaborativeActivity_10 }}</td>
-      <td>{{ row.Exam_1_20 }}</td>
-      <td>{{ row.Grade__Real }}</td>
-      <td>{{ row.Grade__prediccion__Bosques__Aleatorios }}</td>
+      <form method="post">
+        {% csrf_token %}
 
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+        <label for="students">Students:</label>
+        <input type="text" id="students" name="students" required><br><br>
+
+        <label for="workshop">Workshop_1_10%:</label>
+        <input type="text" id="workshop" name="workshop" required><br><br>
+        
+        <label for="collaborative">CollaborativeActivity_10%:</label>
+        <input type="text" id="collaborative" name="collaborative" required><br><br>
+        
+        <label for="exam">Exam_1_20%:</label>
+        <input type="text" id="exam" name="exam" required><br><br>
+        
+        <button type="submit">Realizar nueva predicción</button>
+      </form>
+      <h2>Nueva Predicción:</h2>
+      {% if nueva_prediccion %}
+        <p>{{ nueva_prediccion }}</p>
+      {% endif %}
+      <h2>Gráfica de dispersión:</h2>
+      <img src="{% static 'scatter_plot.png' %}" alt="Scatter Plot">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Students</th>
+            <th>Workshop_1_10_</th>
+            <th>CollaborativeActivity_10%</th>
+            <th>Exam_1_20%</th>
+            <th>Grade (Real)</th>
+            <th>Grade prediccion (Bosques Aleatorios)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for index, row in results.iterrows %}
+          <tr>
+            <td>{{ row.Students }}</td>
+            <td>{{ row.Workshop__1_10 }}</td>
+            <td>{{ row.CollaborativeActivity_10 }}</td>
+            <td>{{ row.Exam_1_20 }}</td>
+            <td>{{ row.Grade__Real }}</td>
+            <td>{{ row.Grade__prediccion__Bosques__Aleatorios }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
+</body>
+</html>
+

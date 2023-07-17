@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href={% static 'style.css' %}>
+    <title>Docentes app</title>
+</head>
+<body>
+    <main>
+        <h1 class="main-title">Docentes</h1>
+        <a href="{% url 'create_docente' %}">
+            <button class="button create">Crear Docente</button>
+        </a>
+        <table>
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Cédula</th>
+                    <th>Curso</th>
+                    <th>Correo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for docente in docentes %}
+                <tr>
+                    <td><img src="{{ docente.foto.url }}" height="100"></td>
+                    <td>{{ docente.nombre }}</td>
+                    <td>{{ docente.apellido }}</td>
+                    <td>{{ docente.cedula }}</td>
+                    <td>{{ docente.curso }}</td>
+                    <td>{{ docente.correo }}</td>
+                    <td>
+                        <a href="{% url 'edit_docente' docente.id %}" class="button edit-button">Editar</a>
+                        <form action="{% url 'delete_docente' docente.id %}" method="POST" class="delete-form" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este docente?');">
+                            {% csrf_token %}
+                            <button class="button delete">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

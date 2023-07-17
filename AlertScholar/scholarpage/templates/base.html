@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>{% block title %} {% endblock %}</title>
+    {% load static %}
     <style>
         /* Estilos para la barra de navegación */
         nav {
@@ -48,6 +49,7 @@
         <ul>
           
           <li><a href="{% url 'estudiantes' %}">Estudiantes</a></li>
+          <li><a href="{% url 'docentes' %}">Docentes</a></li>
           {% if user.is_authenticated %}
             <li><a href="{% url 'carga_excel' %}">Subir notas</a></li>
             <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>

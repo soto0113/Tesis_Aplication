@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Docente</title>
+    {% load static %}
+    <style>
+        /* Estilos para create estudiante */
+        body {
+        background-color: #f7f7f7;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        }
+
+        main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        }
+
+        .main-form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-title {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+        }
+
+        form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        }
+
+        .form-field {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        }
+
+        label {
+        margin-bottom: 5px;
+        color: #333;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        input[type="email"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 300px;
+        }
+
+        button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 10px;
+        }
+
+        a {
+        text-decoration: none;
+        color: #007bff;
+        }
+
+        .cancel {
+        padding: 10px 20px;
+        background-color: red;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 10px;
+        }
+
+        .button-container {
+        display: flex;
+        justify-content: flex-start;
+        gap: 10px; /* Ajusta el espacio entre los botones según tu preferencia */
+        }
+
+    </style>
+</head>
+<body>
+
+    <main>
+        <div class="main-form">
+            <h1 class="main-title">Crear Docente</h1>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="id_foto">Foto:</label>
+                    <input type="file" name="foto" id="id_foto" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_nombre">Nombre:</label>
+                    <input type="text" name="nombre" id="id_nombre" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_apellido">Apellido:</label>
+                    <input type="text" name="apellido" id="id_apellido" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_cedula">Cedula:</label>
+                    <input type="text" name="cedula" id="id_cedula" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_curso">Curso:</label>
+                    <input type="text" name="curso" id="id_curso" required>
+                </div>
+                <div class="form-field">
+                    <label for="id_correo">Correo:</label>
+                    <input type="email" name="correo" id="id_correo" required>
+                </div>
+                <div class="button-container">
+                    <button class="button creates" type="submit">Crear docente</button>
+                    <a class="cancel" href="{% url 'docentes' %}">Cancelar</a>
+                </div>
+                  
+            </form>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,12 +1,38 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
-# Create your models here.
 class Estudiante(models.Model):
     foto = models.ImageField(upload_to='imagenes/', verbose_name="Imagen", null=True)
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
     codigo = models.CharField(max_length=11)
     correo = models.EmailField(max_length=100)
+    password = models.CharField(max_length=128)
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
+
+    def save(self, *args, **kwargs):
+        # Hashear la contraseña antes de guardarla
+        self.password = make_password(self.password)
+        super().save(*args, **kwargs)
+        
+class Docente(models.Model):
+    foto = models.ImageField(upload_to='imagenes/', verbose_name="Imagen", null=True)
+    nombre = models.CharField(max_length=50)
+    apellido = models.CharField(max_length=50)
+    cedula = models.CharField(max_length=11)
+    curso = models.CharField(max_length=100)
+    correo = models.EmailField(max_length=100)
+    password = models.CharField(max_length=128)
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
+
+    def save(self, *args, **kwargs):
+        # Hashear la contraseña antes de guardarla
+        self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 '''
     def __str__(self):
         fila = self.nombre + " "+ self.apellido
