@@ -17,6 +17,7 @@ class Estudiante(models.Model):
         self.password = make_password(self.password)
         super().save(*args, **kwargs)
         
+        
 class Docente(models.Model):
     foto = models.ImageField(upload_to='imagenes/', verbose_name="Imagen", null=True)
     nombre = models.CharField(max_length=50)
@@ -33,6 +34,11 @@ class Docente(models.Model):
         # Hashear la contraseña antes de guardarla
         self.password = make_password(self.password)
         super().save(*args, **kwargs)
+
+class meta ():
+    estud = TabError
+    
+
 '''
     def __str__(self):
         fila = self.nombre + " "+ self.apellido
@@ -42,9 +48,6 @@ class Docente(models.Model):
         self.foto.storage.delete(self.foto.name)
         super().delete()
 ''' 
-class meta ():
-    estud = TabError
-    
 
     # def save(self, *args, **kwargs):
     #     # Si la instancia ya existe, borre su imagen anterior

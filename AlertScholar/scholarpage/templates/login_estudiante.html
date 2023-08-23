@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href={% static 'style.css' %}>
-    <title>Crear estudiante</title>
+    <title>Login estudiante</title>
 </head>
 <body>
 
@@ -19,8 +19,8 @@
           <form method="post">
               {% csrf_token %}
               <div class="form-group">
-                  <label for="username">Username:</label>
-                  <input type="text" class="form-control" name="username" id="username">
+                <label for="correo">Correo electrónico:</label>
+                <input type="email" id="correo" name="correo" required>
               </div>
               <div class="form-group">
                   <label for="password">Password:</label>

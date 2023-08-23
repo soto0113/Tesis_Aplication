@@ -50,12 +50,12 @@
           
           <li><a href="{% url 'estudiantes' %}">Estudiantes</a></li>
           <li><a href="{% url 'docentes' %}">Docentes</a></li>
-          {% if user.is_authenticated %}
+        <!--  {% if user.is_authenticated %}
             <li><a href="{% url 'carga_excel' %}">Subir notas</a></li>
             <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
           {% else %}
             <li><a href="{% url 'login_estudiante' %}">Iniciar sesión</a></li>
-          {% endif %}
+          {% endif %}-->
         </ul>
       </nav>
     <main>

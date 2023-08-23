@@ -30,7 +30,7 @@ def view_estudiante(request):
     estudiantes = Estudiante.objects.all()
     return render(request, 'view_estudiante.html', {'estudiantes': estudiantes})
 
-@login_required
+#@login_required
 def create_estudiante(request):
     if request.method == 'POST':
         form = EstudianteForm(request.POST, request.FILES)
@@ -41,7 +41,7 @@ def create_estudiante(request):
         form = EstudianteForm()
     return render(request, 'create_estudiante.html', {'forms': form})
 
-@login_required
+#@login_required
 def delete_estudiante(request, id):
     estudiante = Estudiante.objects.get(id=id)
     if request.method == 'POST':
@@ -50,7 +50,7 @@ def delete_estudiante(request, id):
         return redirect('/')
     return render(request, 'delete_estudiante.html', {'estudiante': estudiante})
 
-@login_required
+#@login_required
 def edit_estudiante(request, id):
     estudiante = Estudiante.objects.get(id=id)
     forms = EstudianteForm(request.POST or None, instance=estudiante)
@@ -63,7 +63,7 @@ def view_docente(request):
     docentes = Docente.objects.all()
     return render(request, 'view_docente.html', {'docentes': docentes})
 
-@login_required
+#@login_required
 def create_docente(request):
     if request.method == 'POST':
         form = DocenteForm(request.POST, request.FILES)
@@ -74,7 +74,7 @@ def create_docente(request):
         form = DocenteForm()
     return render(request, 'create_docente.html', {'form': form})
 
-@login_required
+#@login_required
 def delete_docente(request, id):
     docente = Docente.objects.get(id=id)
     if request.method == 'POST':
@@ -83,7 +83,7 @@ def delete_docente(request, id):
         return redirect('/')
     return render(request, 'delete_docente.html', {'docente': docente})
 
-@login_required
+#@login_required
 def edit_docente(request, id):
     docente = Docente.objects.get(id=id)
     form = DocenteForm(request.POST or None, instance=docente)
@@ -92,35 +92,47 @@ def edit_docente(request, id):
         return redirect('/')
     return render(request, 'edit_docente.html', {'forms': form})
 
-def login_estudiante(request):
+#def login_estudiante(request):
     if request.method == 'POST':
         # Obtener el usuario y la contraseña del formulario
-        username = request.POST['username']
+        username = request.POST['correo']
         password = request.POST['password']
-        
-        # Autenticar al usuario
-        user = authenticate(request, username=username, password=password)
-        
-        # Si el usuario es autenticado correctamente, iniciar sesión y redirigir al usuario a la página de inicio
-        if user is not None:
-            login(request, user)
-            return redirect('/')
-        else:
-            # Si la autenticación falla, mostrar un mensaje de error
-            messages.error(request, 'El usuario o la contraseña son incorrectos.')
+        print(f'Username: {username}, Password: {password}')
+        # Verificar si el usuario existe en la tabla de Estudiante o Docente
+        try:
+            estudiante = Estudiante.objects.get(correo=username)
+            user = authenticate(request, username=estudiante.correo, password=password)
+
+            if user is not None:
+                print("Autenticación exitosa:", user)
+                login(request, user)
+                return redirect('view_estudiante/')
+        except Estudiante.DoesNotExist:
+            pass
+
+        try:
+            docente = Docente.objects.get(correo=username)
+            user = authenticate(request, username=docente.correo, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('view_docente/')
+        except Docente.DoesNotExist:
+            pass
+
+        # Si la autenticación falla, mostrar un mensaje de error
+        messages.error(request, 'El usuario o la contraseña son incorrectos.')
     else:
         # Si el método no es POST, mostrar un mensaje de información
         messages.info(request, 'Por favor inicia sesión.')
-    
+
     # Renderizar el formulario de inicio de sesión
     return render(request, 'login_estudiante.html')
 
-@login_required
-def logout_estudiante(request):
+#def logout_estudiante(request):
     logout(request)
     return redirect('/')
 
-@login_required
+#@login_required
 def carga_excel(request):
     if request.method == 'POST':
         file = request.FILES['excel_file']
@@ -178,45 +190,71 @@ def carga_excel(request):
 
     return render(request, 'carga_excel.html')
 
-@login_required
+#@login_required
 def carga_excel2(request):
     if request.method == 'POST':
         file = request.FILES['excel_file']
-        data = pd.read_excel(file)
+        df = pd.read_excel(file)
+        columns = df.columns.tolist()
 
-        # Seleccionar las columnas relevantes
-        columns = ['Workshop 1_10%', 'CollaborativeActivity_10%', 'Exam 1_ 20%', 'Grade']
-        data = data[columns]
+        # Calcular el factor de ponderación basado en el 40% de las notas
+        num_columns = len(columns) - 2
+        weight_factor = 0.5 / num_columns
 
-        # Eliminar filas con valores faltantes
-        data = data.dropna()
+        # Multiplicar las columnas de notas por el factor de ponderación
+        df.iloc[:, 2:] = df.iloc[:, 2:] * weight_factor
 
-        # Separar características (X) y variable objetivo (y)
-        X = data[['Workshop 1_10%', 'CollaborativeActivity_10%', 'Exam 1_ 20%']]
-        y = data['Grade']
+        # Calcular la columna "Grade" sumando las notas ponderadas
+        df['Grade'] = df.iloc[:, 2:].sum(axis=1)
 
-        # Dividir los datos en conjuntos de entrenamiento y prueba
+        X = df.iloc[:, 1:-1]  # Excluir las columnas "estudiante" y "Grade"
+        y = df['Grade']
+
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-        # Crear y entrenar el modelo Random Forest
-        model = RandomForestRegressor(n_estimators=100, random_state=42)
-        model.fit(X_train, y_train)
+        # Bosques Aleatorios
+        rf_model = RandomForestRegressor()
+        rf_model.fit(X_train, y_train)
+        y_pred_rf = rf_model.predict(X_test)
+        r2_rf = r2_score(y_test, y_pred_rf)
+        mae = mean_absolute_error(y_test, y_pred_rf)
+        mape = mean_absolute_percentage_error(y_test, y_pred_rf)
+        rmse = mean_squared_error(y_test, y_pred_rf, squared=False)
 
-        # Realizar predicciones en el conjunto de prueba
-        y_pred = model.predict(X_test)
+        results = df.copy()
+        results['Grade (Real)'] = y_test.tolist()
+        results['Grade Predicción (Bosques Aleatorios)'] = y_pred_rf.tolist()
 
-        # Calcular el error cuadrático medio (MSE)
-        mse = mean_squared_error(y_test, y_pred)
-        print('Error cuadrático medio:', mse)
+        # Calcular los estadísticos del curso
+        course_stats = {
+            'media': np.mean(y),
+            'mediana': np.median(y),
+            'moda': y.mode()[0],
+            'desviacion_estandar': np.std(y)
+        }
 
-        # Mostrar las características y la nota final en el conjunto de prueba
-        results = X_test.copy()
-        results['Nota'] = y_test
-        results['Prediccion'] = y_pred
-        results = results.rename(columns={'Workshop 1_10%': 'Workshop__1_10', 'Exam 1_ 20%': 'Exam_1_20', 'CollaborativeActivity_10%': 'CollaborativeActivity_10', 'Grade (Real)': 'Grade__Real', 'Grade prediccion (Bosques Aleatorios)': 'Grade__prediccion__Bosques__Aleatorios'})  
-        results = results.reset_index(drop=True)
-        print(results)
-        
-        return render(request, 'result.html', {'columns': columns, 'results': results})
+        # Crear la gráfica de dispersión
+        plt.figure(figsize=(8, 6))
+        plt.scatter(y_pred_rf, y_test, color='green', label='Predicción vs. Real')
+
+        # Agregar los valores estadísticos a la gráfica
+        plt.scatter(course_stats['media'], course_stats['media'], color='blue', label=f'Media: {course_stats["media"]:.2f}')
+        plt.scatter(course_stats['mediana'], course_stats['mediana'], color='purple', label=f'Mediana: {course_stats["mediana"]:.2f}')
+        plt.scatter(course_stats['moda'], course_stats['moda'], color='orange', label=f'Moda: {course_stats["moda"]:.2f}')
+        plt.scatter(course_stats['desviacion_estandar'], course_stats['desviacion_estandar'], color='yellow', label=f'Desviación Estándar: {course_stats["desviacion_estandar"]:.2f}')
+
+        # Configurar la leyenda y los ejes
+        plt.legend()
+        plt.xlabel('Valor Predicho')
+        plt.ylabel('Valor Real')
+        plt.title('Gráfica de Dispersión: Valor Predicho vs. Valor Real')
+
+        # Guardar la gráfica como una imagen
+        plt.savefig('scholarpage/static/scatter_plot.png')
+
+        # Convertir resultados a formato HTML
+        results_html = results.to_html(classes='table table-bordered table-striped table-responsive')
+
+        return render(request, 'result.html', {'columns': columns, 'results_html': results_html, 'r2_rf': r2_rf, 'mae': mae, 'mape': mape, 'rmse': rmse})
 
     return render(request, 'carga_excel2.html')
