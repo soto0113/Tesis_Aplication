@@ -23,6 +23,7 @@
                     <th>Cédula</th>
                     <th>Curso</th>
                     <th>Correo</th>
+                    <th>Password</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -35,6 +36,7 @@
                     <td>{{ docente.cedula }}</td>
                     <td>{{ docente.curso }}</td>
                     <td>{{ docente.correo }}</td>
+                    <td>{{ docente.password }}</td>
                     <td>
                         <a href="{% url 'edit_docente' docente.id %}" class="button edit-button">Editar</a>
                         <form action="{% url 'delete_docente' docente.id %}" method="POST" class="delete-form" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este docente?');">

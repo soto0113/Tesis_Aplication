@@ -22,6 +22,7 @@
                     <th>Apellido</th>
                     <th>Código</th>
                     <th>Correo</th>
+                    <th>Password</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -33,6 +34,7 @@
                     <td>{{estudiante.apellido}}</td>
                     <td>{{estudiante.codigo}}</td>
                     <td>{{estudiante.correo}}</td>
+                    <td>{{estudiante.password }}</td>
                     <td>
                         <a href="{% url 'edit_estudiante' estudiante.id %}" class="button edit-button">Editar</a>
                         <form 

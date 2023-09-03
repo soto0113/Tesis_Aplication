@@ -1,51 +1,42 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href={% static 'style.css' %}>
-    <title>Estudiantes app</title>
+    <title>Resultados de Análisis</title>
 </head>
 <body>
-    <main>
-      <h1 class="main-title">Resultados de la Regresión con Bosques Aleatorios</h1>
-
-      <h2>Coeficiente de determinación (R2): {{ r2_rf }}</h2>
-      <h2>Error absoluto medio (MAE): {{ mae }}</h2>
-      <h2>Error porcentual absoluto medio (MAPE): {{ mape }}</h2>
-      <h2>Raíz del error cuadrático medio (RMSE): {{ rmse }}</h2>
-
-      <h2>Gráfica de dispersión:</h2>
-      <img src="{% static 'scatter_plot.png' %}" alt="Scatter Plot">
-
-      <table>
+    <h1>Resultados de Análisis</h1>
+    <h2>Columnas del Archivo Excel</h2>
+    <ul>
+        {% for column in columns %}
+            <li>{{ column }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Resultados</h2>
+    <table border="1">
         <thead>
             <tr>
+                <th>Índice</th>
                 {% for column in columns %}
-                <th>{{ column }}</th>
+                    <th>{{ column }}</th>
                 {% endfor %}
-                <th>Grade (Real)</th>
-                <th>Grade prediccion (Bosques Aleatorios)</th>
             </tr>
         </thead>
         <tbody>
-          {% for index, row in results.iterrows %}
-          <tr>
-              {% for column in columns %}
-              <td>{{ row[column] }}</td>
-              {% endfor %}
-              <td>{{ row['Grade (Real)'] }}</td>
-              <td>{{ row['Grade Predicción (Bosques Aleatorios)'] }}</td>
-          </tr>
-          {% endfor %}
-      </tbody>
-      
-      
-      
+            {% for index, row in results.iterrows %}
+                <tr>
+                    <td>{{ index }}</td>
+                    {% for column in columns %}
+                        <td>{row{ column }}</td>
+                                
+                        <td>{{ Grade__Real }}</td>
+                        <td>{{ Grade__prediccion__Bosques__Aleatorios }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
-    </main>
+    <h2>Métricas de Evaluación del Modelo</h2>
+    <pre>{{ metrics }}</pre>
 </body>
 </html>
-
