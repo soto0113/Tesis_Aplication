@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import view_estudiante, create_estudiante, delete_estudiante, edit_estudiante, base, login_estudiante,logout_estudiante, carga_excel, carga_excel2, view_docente, create_docente, edit_docente, delete_docente#, nueva_prediccion
+from .views import view_estudiante, create_estudiante, delete_estudiante, edit_estudiante, base, login_estudiante,logout_estudiante, metodo1, carga_excel, view_docente, create_docente, edit_docente, delete_docente#, nueva_prediccion
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.contrib.staticfiles.urls import static
@@ -15,8 +15,8 @@ urlpatterns = [
     path('create_docente/', create_docente, name='create_docente'),
     path('edit_docente/<int:id>/', edit_docente, name='edit_docente'),
     path('delete_docente/<int:id>/', delete_docente, name='delete_docente'),
+    path('metodo1', metodo1, name='carga_excel'),
     path('carga_excel', carga_excel, name='carga_excel'),
-    path('carga_excel2', carga_excel2, name='carga_excel2'),
   #  path('nueva_prediccion/', nueva_prediccion, name='nueva_prediccion'),
     path('logout/', logout_estudiante, name='logout'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

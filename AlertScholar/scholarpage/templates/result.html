@@ -16,25 +16,25 @@
     <table border="1">
         <thead>
             <tr>
-                <th>Índice</th>
                 {% for column in columns %}
                     <th>{{ column }}</th>
                 {% endfor %}
+                <th>Grade (Real)</th>
+                <th>Grade Predicción</th>
             </tr>
         </thead>
+        
         <tbody>
-            {% for index, row in results.iterrows %}
+            {% for row in results %}
                 <tr>
-                    <td>{{ index }}</td>
-                    {% for column in columns %}
-                        <td>{row{ column }}</td>
-                                
-                        <td>{{ Grade__Real }}</td>
-                        <td>{{ Grade__prediccion__Bosques__Aleatorios }}</td>
+                    <td>{{ forloop.counter }}</td>
+                    {% for column, value in row.items %}
+                        <td>{{ value }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
         </tbody>
+        
     </table>
     <h2>Métricas de Evaluación del Modelo</h2>
     <pre>{{ metrics }}</pre>

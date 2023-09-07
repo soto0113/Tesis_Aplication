@@ -16,7 +16,9 @@ from django.shortcuts import render
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-import pickle
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # Directorio donde se encuentra el archivo modelo.pickle
 MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'modelo.pickle')
@@ -30,7 +32,7 @@ def view_estudiante(request):
     estudiantes = Estudiante.objects.all()
     return render(request, 'view_estudiante.html', {'estudiantes': estudiantes})
 
-@login_required
+#@login_required
 def create_estudiante(request):
     if request.method == 'POST':
         form = EstudianteForm(request.POST, request.FILES)
@@ -41,7 +43,7 @@ def create_estudiante(request):
         form = EstudianteForm()
     return render(request, 'create_estudiante.html', {'forms': form})
 
-@login_required
+#@login_required
 def delete_estudiante(request, id):
     estudiante = Estudiante.objects.get(id=id)
     if request.method == 'POST':
@@ -50,7 +52,7 @@ def delete_estudiante(request, id):
         return redirect('/')
     return render(request, 'delete_estudiante.html', {'estudiante': estudiante})
 
-@login_required
+#@login_required
 def edit_estudiante(request, id):
     estudiante = Estudiante.objects.get(id=id)
     forms = EstudianteForm(request.POST or None, instance=estudiante)
@@ -63,7 +65,7 @@ def view_docente(request):
     docentes = Docente.objects.all()
     return render(request, 'view_docente.html', {'docentes': docentes})
 
-@login_required
+#@login_required
 def create_docente(request):
     if request.method == 'POST':
         form = DocenteForm(request.POST, request.FILES)
@@ -74,7 +76,7 @@ def create_docente(request):
         form = DocenteForm()
     return render(request, 'create_docente.html', {'form': form})
 
-@login_required
+#@login_required
 def delete_docente(request, id):
     docente = Docente.objects.get(id=id)
     if request.method == 'POST':
@@ -83,7 +85,7 @@ def delete_docente(request, id):
         return redirect('/')
     return render(request, 'delete_docente.html', {'docente': docente})
 
-@login_required
+#@login_required
 def edit_docente(request, id):
     docente = Docente.objects.get(id=id)
     form = DocenteForm(request.POST or None, instance=docente)
@@ -95,19 +97,19 @@ def edit_docente(request, id):
 def login_estudiante(request):
     if request.method == 'POST':
         # Obtener el usuario y la contraseña del formulario
-        username = request.POST['username']
-        password = request.POST['password']
+        request.POST['username']
+        request.POST['password']
         
         # Autenticar al usuario
-        user = authenticate(request, username=username, password=password)
+#        user = authenticate(request, username=username, password=password)
         
         # Si el usuario es autenticado correctamente, iniciar sesión y redirigir al usuario a la página de inicio
-        if user is not None:
-            login(request, user)
-            return redirect('/')
-        else:
+ #       if user is not None:
+  #          login(request, user)
+   #         return redirect('/')
+    #    else:
             # Si la autenticación falla, mostrar un mensaje de error
-            messages.error(request, 'El usuario o la contraseña son incorrectos.')
+     #       messages.error(request, 'El usuario o la contraseña son incorrectos.')
     else:
         # Si el método no es POST, mostrar un mensaje de información
         messages.info(request, 'Por favor inicia sesión.')
@@ -120,8 +122,8 @@ def logout_estudiante(request):
     logout(request)
     return redirect('/')
 
-@login_required
-def carga_excel(request):
+#@login_required
+def metodo1(request):
     if request.method == 'POST':
         file = request.FILES['excel_file']
         df = pd.read_excel(file)
@@ -197,7 +199,7 @@ def carga_excel(request):
     return render(request, 'carga_excel.html')
 
 #@login_required
-def carga_excel2(request):
+def carga_excel(request):
     if request.method == 'POST':
         file = request.FILES['excel_file']
         df = pd.read_excel(file)
@@ -231,19 +233,14 @@ def carga_excel2(request):
             df[col + '_weight'] = df[col] * weight
 
         # Calcular la columna "Grade" como la suma de las columnas ponderadas
-        df['Grade'] = df[selected_columns + '_weight'].sum(axis=1)
-
-        # Multiplicar la columna "Grade" por 2
-        df['Grade'] = df['Grade'] * 2
-
+        df['Grade'] = df[selected_columns].mul(weight_per_column).sum(axis=1) * 2
+        
         # Acotar la columna "Grade" a un solo decimal
         df['Grade'] = df['Grade'].round(1)
 
-        # Imprimir 
-        print(df)
-
         # Eliminar las columnas "_weight"
         df = df.drop(columns=[col + '_weight' for col in selected_columns])
+
         # Seleccionar las columnas de interés (excluyendo la primera columna "Students" y "Grade")
         X = df.iloc[:, 1:-1]
         y = df['Grade']
@@ -265,45 +262,65 @@ def carga_excel2(request):
             return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
         mape = mean_absolute_percentage_error(y_test, y_pred_rf)
-
+        
         # Agregar resultados al DataFrame
         results = X_test.copy()
-        results['Grade'] = y_test.tolist()
+        results['Grade (Real)'] = y_test.tolist()
         results['Grade Predicción (Bosques Aleatorios)'] = y_pred_rf.tolist()
-        
-        results = results.rename(columns={'Grade (Real)': 'Grade__Real', 'Grade prediccion (Bosques Aleatorios)': 'Grade__prediccion__Bosques__Aleatorios'})  
         results = results.reset_index(drop=True)
 
-        # Calcular los estadísticos del curso
-        course_stats = {
-            'media': np.mean(y),
-            'mediana': np.median(y),
-            'moda': y.mode()[0],
-            'desviacion_estandar': np.std(y)
-        }
+        results = results.rename(columns={'Grade (Real)': 'Grade__Real', 'Grade Predicción (Bosques Aleatorios)': 'Grade__prediccion__Bosques__Aleatorios'})  
+        results = results.reset_index(drop=True)
 
-
-        # Imprimir resultados y estadísticas del curso
-        results = ("Resultados de la predicción:")
-        #results
-
-        #print("\nEstadísticas del curso:")
-        #for stat, value in course_stats.items():
-        #    print(f"{stat}: {value}")
-
-        results =("\nMétricas de evaluación del modelo:")
-        results =(f"R2: {r2_rf}")
-        results =(f"MAE: {mae}")
-        results =(f"MAPE: {mape}")
-        results =(f"RMSE: {rmse}")
-
-       
         # Convertir el DataFrame a una lista de diccionarios para usar en la plantilla
-       # results_list = results.to_dict(orient='records')
-        # Dentro de la función carga_excel2
+        results_list = results.to_dict(orient='records')
+        
+        # Métricas de evaluación del modelo
         metrics = f"R2: {r2_rf}\nMAE: {mae}\nMAPE: {mape}\nRMSE: {rmse}"
 
-        return render(request, 'result.html', {'columns': columns, 'results': results, 'metrics': metrics})
+        # Filtra los estudiantes con "Grade Predicción" menor a 3.0
+        estudiantes_bajos = results[results['Grade__prediccion__Bosques__Aleatorios'] < 3.0]
+
+        # Función para enviar un correo
+        def enviar_correo(destinatario, asunto, mensaje):
+            # Configura los parámetros del servidor SMTP de Outlook
+            smtp_server = 'smtp.office365.com'
+            smtp_port = 587  # Puerto SMTP para TLS
+
+            # Tu dirección de correo electrónico de Outlook y contraseña
+            remitente = 'alertscholar@hotmail.com'
+            contraseña = 'estudiante2023'
+            try:
+                # Configura el servidor SMTP
+                server = smtplib.SMTP(smtp_server, smtp_port)
+                server.starttls()
+                server.login(remitente, contraseña)
+
+                # Crea el mensaje
+                msg = MIMEMultipart()
+                msg['From'] = remitente
+                msg['To'] = destinatario
+                msg['Subject'] = asunto
+                msg.attach(MIMEText(mensaje, 'plain'))
+
+                # Envía el correo
+                server.sendmail(remitente, destinatario, msg.as_string())
+                server.quit()
+                print(f'Correo enviado a {destinatario}')
+            except Exception as e:
+                print(f'Error al enviar el correo: {str(e)}')
+
+        # Itera a través de los estudiantes con calificaciones bajas y envía correos electrónicos
+        for index, estudiante in estudiantes_bajos.iterrows():
+            #destinatario = estudiante['Correo']  # Asume que la columna del correo se llama 'Correo'
+            asunto = 'Calificación Baja'
+            mensaje = f'Hola estudiante, tu calificación es baja. Por favor, contacta al profesor para obtener ayuda.'
+            
+            enviar_correo('tucorreo@correo.usbcali.edu.co', asunto, mensaje)
+
+        return render(request, 'result.html', {'columns': columns, 'results': results_list, 'metrics': metrics})
 
     return render(request, 'carga_excel2.html')
+
 #df1.array(nombre)
+
